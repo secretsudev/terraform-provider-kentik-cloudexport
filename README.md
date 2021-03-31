@@ -1,1 +1,1 @@
-# https-github.com-TedatKentik-terraform-provider-kentik-cloudexport
+# terraform-provider-kentik-cloudexport
