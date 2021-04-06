@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
-	"github.com/kentik/community_sdk_golang/terraform-provider-kentik-cloudexport/internal/provider"
+	"github.com/kentik/terraform-provider-kentik-cloudexport/internal/provider"
 )
 
 func main() {
