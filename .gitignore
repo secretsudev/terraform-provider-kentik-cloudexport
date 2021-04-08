@@ -35,3 +35,4 @@ website/vendor
 *.winfile eol=crlf
 
 *.hcl
+localhost_apiserver
