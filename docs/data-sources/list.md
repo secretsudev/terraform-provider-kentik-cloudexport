@@ -40,8 +40,6 @@ Read-Only:
 
 - **api_root** (String)
 - **aws** (List of Object) (see [below for nested schema](#nestedobjatt--items--aws))
-- **azure** (List of Object) (see [below for nested schema](#nestedobjatt--items--azure))
-- **bgp** (List of Object) (see [below for nested schema](#nestedobjatt--items--bgp))
 - **cloud_provider** (String)
 - **current_status** (List of Object) (see [below for nested schema](#nestedobjatt--items--current_status))
 - **description** (String)
@@ -64,28 +62,6 @@ Read-Only:
 - **iam_role_arn** (String)
 - **multiple_buckets** (Boolean)
 - **region** (String)
-
-
-<a id="nestedobjatt--items--azure"></a>
-### Nested Schema for `items.azure`
-
-Read-Only:
-
-- **location** (String)
-- **resource_group** (String)
-- **security_principal_enabled** (Boolean)
-- **storage_account** (String)
-- **subscription_id** (String)
-
-
-<a id="nestedobjatt--items--bgp"></a>
-### Nested Schema for `items.bgp`
-
-Read-Only:
-
-- **apply_bgp** (Boolean)
-- **device_bgp_type** (String)
-- **use_bgp_device_id** (String)
 
 
 <a id="nestedobjatt--items--current_status"></a>

@@ -19,28 +19,6 @@ output "aws" {
   value = kentik-cloudexport_item.terraform_aws_export
 }
 
-# create cloudexport for AZURE
-resource "kentik-cloudexport_item" "terraform_azure_export" {
-  name           = "test_terraform_azure_export"
-  type           = "CLOUD_EXPORT_TYPE_KENTIK_MANAGED"
-  enabled        = true
-  description    = "terraform azure cloud export"
-  plan_id        = "11467"
-  cloud_provider = "azure"
-  azure {
-    location                   = "centralus"
-    resource_group             = "traffic-generator"
-    storage_account            = "kentikstorage"
-    subscription_id            = "414bd5ec-122b-41b7-9715-22f23d5b49c8"
-    security_principal_enabled = true
-
-  }
-}
-
-output "azure" {
-  value = kentik-cloudexport_item.terraform_azure_export
-}
-
 # create cloudexport for IBM
 resource "kentik-cloudexport_item" "terraform_ibm_export" {
   name           = "test_terraform_ibm_export"
