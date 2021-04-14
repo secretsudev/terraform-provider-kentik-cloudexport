@@ -34,9 +34,7 @@ output "export_3" {
 
 - **api_root** (String) Hostname of the Kentik deployment where the API calls related to this export should go, eg. api.kentik.com
 - **aws** (List of Object) Properties specific to Amazon Web Services "vpc flow logs" exports (see [below for nested schema](#nestedatt--aws))
-- **azure** (List of Object) Properties specific to Azure exports (see [below for nested schema](#nestedatt--azure))
-- **bgp** (List of Object) Optional BGP related settings (see [below for nested schema](#nestedatt--bgp))
-- **cloud_provider** (String) The cloud provider targeted by this export (aws, azure, gce, ibm)
+- **cloud_provider** (String) The cloud provider targeted by this export (aws, gce, ibm)
 - **current_status** (List of Object) Export task status (see [below for nested schema](#nestedatt--current_status))
 - **description** (String) An optional, longer description
 - **enabled** (Boolean) Whether this task is enabled and intended to run, or disabled
@@ -57,28 +55,6 @@ Read-Only:
 - **iam_role_arn** (String)
 - **multiple_buckets** (Boolean)
 - **region** (String)
-
-
-<a id="nestedatt--azure"></a>
-### Nested Schema for `azure`
-
-Read-Only:
-
-- **location** (String)
-- **resource_group** (String)
-- **security_principal_enabled** (Boolean)
-- **storage_account** (String)
-- **subscription_id** (String)
-
-
-<a id="nestedatt--bgp"></a>
-### Nested Schema for `bgp`
-
-Read-Only:
-
-- **apply_bgp** (Boolean)
-- **device_bgp_type** (String)
-- **use_bgp_device_id** (String)
 
 
 <a id="nestedatt--current_status"></a>
