@@ -1,9 +1,9 @@
-HOSTNAME=kentik.com
-NAMESPACE=automation
-NAME=kentik-cloudexport
-BINARY=terraform-provider-${NAME}
-VERSION=0.1.0
-OS_ARCH=linux_amd64
+HOSTNAME = kentik
+NAMESPACE = automation
+NAME = kentik-cloudexport
+BINARY = terraform-provider-${NAME}
+VERSION := $(shell echo `git tag --list 'v*' | tail -1 | cut -d v -f 2`)
+OS_ARCH := $(shell printf "%s_%s" `go env GOHOSTOS` `go env GOHOSTARCH`)
 
 # apiserver address for the provider under test to talk to (for testing purposes)
 APISERVER_ADDR=localhost:9955
