@@ -23,7 +23,7 @@ test:
 	go build github.com/kentik/community_sdk_golang/apiv6/localhost_apiserver
 
 	# run localhost_apiserver; serve predefined data from json file
-	./localhost_apiserver -addr ${APISERVER_ADDR} -storage internal/provider/CloudExportTestData.json &
+	./localhost_apiserver -addr ${APISERVER_ADDR} -cloudexport internal/provider/CloudExportTestData.json &
 
 	# give the server some warm up time
 	sleep 1 
