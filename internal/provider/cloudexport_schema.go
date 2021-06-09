@@ -341,9 +341,10 @@ func resourceDataToCloudExport(d *schema.ResourceData) (*cloudexport.V202101beta
 		export.SetType(cloudexport.V202101beta1CloudExportType(type_.(string)))
 	}
 
-	if enabled, ok := d.GetOk("enabled"); ok {
-		export.SetEnabled(enabled.(bool))
-	}
+	// set the value even if "enabled" is set to type-zero value (false),
+	// so it is possible to create disabled cloudexports, and disable cloudexports that were previously enabled
+	enabled := d.Get("enabled")
+	export.SetEnabled(enabled.(bool))
 
 	if name, ok := d.GetOk("name"); ok {
 		export.SetName(name.(string))
