@@ -1,6 +1,6 @@
 module github.com/kentik/terraform-provider-kentik-cloudexport
 
-go 1.16
+go 1.15
 
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.4.0
