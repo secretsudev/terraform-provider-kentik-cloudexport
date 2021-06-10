@@ -63,9 +63,9 @@ func configure(c context.Context, d *schema.ResourceData) (interface{}, diag.Dia
 
 func newClient(email, token, url string) *kentikapi.Client {
 	cfg := kentikapi.Config{
-		AuthEmail: email,
-		AuthToken: token,
-		APIURL:    url,
+		AuthEmail:         email,
+		AuthToken:         token,
+		CloudExportAPIURL: url,
 	}
 	return kentikapi.NewClient(cfg)
 }
