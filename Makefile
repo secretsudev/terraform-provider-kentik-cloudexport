@@ -1,4 +1,4 @@
-HOSTNAME = kentik.com
+HOSTNAME = kentik
 NAMESPACE = automation
 NAME = kentik-cloudexport
 BINARY = terraform-provider-${NAME}

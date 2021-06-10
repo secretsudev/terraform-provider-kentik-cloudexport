@@ -2,7 +2,7 @@ terraform {
   required_providers {
     kentik-cloudexport = {
       version = ">= 0.2.0"
-      source  = "kentik.com/automation/kentik-cloudexport"
+      source  = "kentik/automation/kentik-cloudexport"
     }
   }
 }

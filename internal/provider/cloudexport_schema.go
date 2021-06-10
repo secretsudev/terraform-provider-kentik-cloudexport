@@ -333,47 +333,47 @@ func resourceDataToCloudExport(d *schema.ResourceData) (*cloudexport.V202101beta
 
 	export := cloudexport.NewV202101beta1CloudExport()
 
-	if id, ok := d.GetOk("id"); ok {
-		export.SetId(id.(string))
-	}
+	// required
+	type_ := d.Get("type")
+	export.SetType(cloudexport.V202101beta1CloudExportType(type_.(string)))
 
-	if type_, ok := d.GetOk("type"); ok {
-		export.SetType(cloudexport.V202101beta1CloudExportType(type_.(string)))
-	}
-
-	// set the value even if "enabled" is set to type-zero value (false),
-	// so it is possible to create disabled cloudexports, and disable cloudexports that were previously enabled
+	// required
 	enabled := d.Get("enabled")
 	export.SetEnabled(enabled.(bool))
 
-	if name, ok := d.GetOk("name"); ok {
-		export.SetName(name.(string))
-	}
+	// required
+ 	name := d.Get("name")
+	export.SetName(name.(string))
 
+	// optional
 	if description, ok := d.GetOk("description"); ok {
 		export.SetDescription(description.(string))
 	}
 
+	// optional
 	if apiRoot, ok := d.GetOk("api_root"); ok {
 		export.SetApiRoot(apiRoot.(string))
 	}
 
+	// optional
 	if flowDest, ok := d.GetOk("flow_dest"); ok {
 		export.SetFlowDest(flowDest.(string))
 	}
 
-	if planID, ok := d.GetOk("plan_id"); ok {
-		export.SetPlanId(planID.(string))
-	}
+	// required
+	planID := d.Get("plan_id")
+	export.SetPlanId(planID.(string))
+
+	// required
+	cloudProvider := d.Get("cloud_provider").(string)
+	export.SetCloudProvider(cloudProvider)
 
 	// validation: for any given cloud_provider, there should also be an object of the same name, containing configuration details
 	// eg for cloud_provider="ibm", ibm{...} object should be defined
-	cloudProvider := d.Get("cloud_provider").(string)
 	providerObj, ok := d.GetOk(cloudProvider)
 	if !ok {
 		return nil, fmt.Errorf("for cloud_provider=%[1]s, there should also be %[1]s{...} attribute provided", cloudProvider)
 	}
-	export.SetCloudProvider(cloudProvider)
 	providerDef := providerObj.([]interface{})[0] // extract nested object under index 0. Terraform clumsyness
 	providerMap := providerDef.(map[string]interface{})
 	switch cloudProvider {
