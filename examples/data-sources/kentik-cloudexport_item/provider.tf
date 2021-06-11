@@ -1,9 +1,9 @@
-# Note: configuration for locally-built provider
 terraform {
   required_providers {
     kentik-cloudexport = {
-      version = ">= 0.2.0"
-      source  = "kentik/automation/kentik-cloudexport"
+      version = ">= 0.3.0"
+      source = "kentik/kentik-cloudexport" # use provider from registry.terraform.io
+      # source  = "kentik/automation/kentik-cloudexport" # use locally-built provider (make install)
     }
   }
 }
