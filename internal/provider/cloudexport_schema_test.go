@@ -1,12 +1,13 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func TestCloudExportSerializerAlwaysSetsEnabledField(t *testing.T) {
+func TestCloudExportSerializerAlwaysSetsTheEnabledField(t *testing.T) {
 	test_cases := []struct{
 		configuredInput interface{}
 		expectedOutput bool
@@ -26,35 +27,37 @@ func TestCloudExportSerializerAlwaysSetsEnabledField(t *testing.T) {
 	}
 
 	for _, tc := range test_cases {
-		// given
-		d := makeDummyResourceData(t)
-		if err := d.Set("enabled", tc.configuredInput); err != nil {
-			t.Fatal(err)
-		}
+		subtestName := fmt.Sprintf("Configured input: %v, expected output: %v", tc.configuredInput, tc.expectedOutput)
+		t.Run(subtestName, func(t* testing.T) {
+			// given
+			d := makeDummyResourceData(t)
+			if err := d.Set("enabled", tc.configuredInput); err != nil {
+				t.Fatal(err)
+			}
 
-		// when
-		export, err := resourceDataToCloudExport(d)
+			// when
+			export, err := resourceDataToCloudExport(d)
 
-		// then
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-		if export.Enabled == nil {
-			t.Errorf("Expected export.Enabled != nil, got nil for input %v", tc.configuredInput)
-			continue
-		}
+			// then
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		if *export.Enabled != tc.expectedOutput {
-			t.Errorf("Expected *export.Enabled == %v, got %v for input %v", tc.expectedOutput, *export.Enabled, tc.configuredInput)
-		}
+			if export.Enabled == nil {
+				t.Fatal("Got unexpected output: nil")
+			}
+
+			if *export.Enabled != tc.expectedOutput {
+				t.Errorf("Got unexpected output: %v", *export.Enabled)
+			}
+		})
 	}
 }
 
 func makeDummyResourceData(t *testing.T) *schema.ResourceData {
 	type ProviderDefinition = map[string]interface{} // groups provider's attributes
 	const provider = "ibm"
-	
+
 	d := resourceCloudExport().Data(nil)
 	if err := d.Set("cloud_provider", provider); err != nil {
 		t.Fatal(err)
