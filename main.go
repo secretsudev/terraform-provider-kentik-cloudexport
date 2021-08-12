@@ -19,7 +19,7 @@ func main() {
 	opts := &plugin.ServeOpts{ProviderFunc: provider.New}
 
 	if debugMode {
-		err := plugin.Debug(context.Background(), "registry.terraform.io/providers/kentik/kentik-cloudexport", opts)
+		err := plugin.Debug(context.Background(), "kentik/kentik-cloudexport", opts)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
