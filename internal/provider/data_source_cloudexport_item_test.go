@@ -10,6 +10,7 @@ import (
 // Note: values checked in below tests are provided by localhost_apiserver from CloudExportTestData.json (running in background)
 
 func TestDataSourceCloudExportItemAWS(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -43,6 +44,7 @@ func TestDataSourceCloudExportItemAWS(t *testing.T) {
 }
 
 func TestDataSourceCloudExportItemGCE(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -73,6 +75,7 @@ func TestDataSourceCloudExportItemGCE(t *testing.T) {
 }
 
 func TestDataSourceCloudExportItemIBM(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -102,6 +105,7 @@ func TestDataSourceCloudExportItemIBM(t *testing.T) {
 }
 
 func TestDataSourceCloudExportItemAzure(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -135,6 +139,7 @@ func TestDataSourceCloudExportItemAzure(t *testing.T) {
 }
 
 func TestDataSourceCloudExportItemBGP(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,

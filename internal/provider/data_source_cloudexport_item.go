@@ -17,12 +17,11 @@ func dataSourceCloudExportItem() *schema.Resource {
 }
 
 func dataSourceCloudExportItemRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	client := m.(*kentikapi.Client)
-	exportID := d.Get("id").(string)
-	req := client.CloudExportAdminServiceApi.CloudExportAdminServiceGetCloudExport(ctx, exportID)
-	getResp, httpResp, err := req.Execute()
+	getResp, httpResp, err := m.(*kentikapi.Client).CloudExportAdminServiceAPI.
+		ExportGet(ctx, d.Get("id").(string)).
+		Execute()
 	if err != nil {
-		return diagError("Failed to read cloud export item", err, httpResp)
+		return detailedDiagError("Failed to read cloud export item", err, httpResp)
 	}
 
 	mapExport := cloudExportToMap(getResp.Export)

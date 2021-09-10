@@ -8,27 +8,28 @@ import (
 )
 
 func TestCloudExportSerializerAlwaysSetsTheEnabledField(t *testing.T) {
-	test_cases := []struct{
+	t.Parallel()
+	test_cases := []struct {
 		configuredInput interface{}
-		expectedOutput bool
+		expectedOutput  bool
 	}{
 		{
 			configuredInput: nil,
-			expectedOutput: false,
+			expectedOutput:  false,
 		},
 		{
 			configuredInput: false,
-			expectedOutput: false,
+			expectedOutput:  false,
 		},
 		{
 			configuredInput: true,
-			expectedOutput: true,
+			expectedOutput:  true,
 		},
 	}
 
 	for _, tc := range test_cases {
 		subtestName := fmt.Sprintf("Configured input: %v, expected output: %v", tc.configuredInput, tc.expectedOutput)
-		t.Run(subtestName, func(t* testing.T) {
+		t.Run(subtestName, func(t *testing.T) {
 			// given
 			d := makeDummyResourceData(t)
 			if err := d.Set("enabled", tc.configuredInput); err != nil {

@@ -27,11 +27,11 @@ func dataSourceCloudExportList() *schema.Resource {
 }
 
 func dataSourceCloudExportListRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	client := m.(*kentikapi.Client)
-	req := client.CloudExportAdminServiceApi.CloudExportAdminServiceListCloudExport(ctx)
-	listResp, httpResp, err := req.Execute()
+	listResp, httpResp, err := m.(*kentikapi.Client).CloudExportAdminServiceAPI.
+		ExportList(ctx).
+		Execute()
 	if err != nil {
-		return diagError("Failed to read cloud export list", err, httpResp)
+		return detailedDiagError("Failed to read cloud export list", err, httpResp)
 	}
 
 	if listResp.Exports != nil {
@@ -41,7 +41,7 @@ func dataSourceCloudExportListRead(ctx context.Context, d *schema.ResourceData, 
 			exports[i] = cloudExportToMap(&e)
 		}
 
-		if err := d.Set("items", exports); err != nil {
+		if err = d.Set("items", exports); err != nil {
 			return diag.FromErr(err)
 		}
 	}
