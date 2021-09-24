@@ -7,255 +7,275 @@ import (
 	"github.com/kentik/community_sdk_golang/apiv6/kentikapi/cloudexport"
 )
 
-// schemaMode determines if we want a schema for:
-// -reading single item - we need to provide "id" of the item to read, everything else is provided by server
-// -reading list of items - we don't need to provide a thing, everything is provided by server
-// -creating new item - we need to provide a bunch of obligatory attributes, the rest is provided by the server
-type schemaMode int
-
-const (
-	READ_SINGLE schemaMode = iota
-	READ_LIST
-	CREATE
-)
-
 // CloudExportSchema reflects V202101beta1CloudExport type and defines a CloudExport item used in terraform .tf files
 // Note: currently, nesting an object is only possible by using single-item List element (Terraform limitation)
+//nolint: gocognit, gocyclo
 func makeCloudExportSchema(mode schemaMode) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"id": &schema.Schema{
+		"id": {
 			Type:        schema.TypeString,
-			Computed:    mode == CREATE || mode == READ_LIST, // provided by server on creating/listing items
-			Required:    mode == READ_SINGLE,                 // provided by user in order to read single item
+			Computed:    mode == create || mode == readList, // provided by server on creating/listing items
+			Required:    mode == readSingle,                 // provided by user in order to read single item
 			Description: "The internal cloud export identifier. This is Read-only and assigned by Kentik",
 		},
-		"type": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Required:    mode == CREATE,                           // provided by user on create
-			Description: "CLOUD_EXPORT_TYPE_UNSPECIFIED: Invalid or incomplete exports. CLOUD_EXPORT_TYPE_KENTIK_MANAGED: Cloud exports that are managed by Kentik. CLOUD_EXPORT_TYPE_CUSTOMER_MANAGED: Exports that are managed by Kentik customers (eg. by running an agent)",
+		"type": {
+			Type:     schema.TypeString,
+			Computed: mode == readSingle || mode == readList, // provided by server on read
+			Required: mode == create,                         // provided by user on create
+			Description: "CLOUD_EXPORT_TYPE_UNSPECIFIED: Invalid or incomplete exports. " +
+				"CLOUD_EXPORT_TYPE_KENTIK_MANAGED: Cloud exports that are managed by Kentik. " +
+				"CLOUD_EXPORT_TYPE_CUSTOMER_MANAGED: Exports that are managed by Kentik customers " +
+				"(eg. by running an agent)",
 		},
-		"enabled": &schema.Schema{
+		"enabled": {
 			Type:        schema.TypeBool,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Required:    mode == CREATE,                           // provided by user on create
+			Computed:    mode == readSingle || mode == readList, // provided by server on read
+			Required:    mode == create,                         // provided by user on create
 			Description: "Whether this task is enabled and intended to run, or disabled",
 		},
-		"name": &schema.Schema{
+		"name": {
 			Type:        schema.TypeString,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Required:    mode == CREATE,                           // provided by user on create
+			Computed:    mode == readSingle || mode == readList, // provided by server on read
+			Required:    mode == create,                         // provided by user on create
 			Description: "A short name for this export",
 		},
-		"description": &schema.Schema{
+		"description": {
 			Type:        schema.TypeString,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Optional:    mode == CREATE,                           // optionally provided by user on create
+			Computed:    mode == readSingle || mode == readList, // provided by server on read
+			Optional:    mode == create,                         // optionally provided by user on create
 			Description: "An optional, longer description",
 		},
-		"api_root": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST || mode == CREATE, // if not specified by user, apiserver will provide value for this attribute
-			Optional:    mode == CREATE,                                             // optionally provided by user on create
-			Description: "Hostname of the Kentik deployment where the API calls related to this export should go, eg. api.kentik.com",
+		"api_root": {
+			Type: schema.TypeString,
+			// if not specified by user, API server will provide value for this attribute
+			Computed: mode == readSingle || mode == readList || mode == create,
+			Optional: mode == create, // optionally provided by user on create
+			Description: "Hostname of the Kentik deployment where the API calls related to this export should go, " +
+				"eg. api.kentik.com",
 		},
-		"flow_dest": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST || mode == CREATE, // if not specified by user, apiserver will provide value for this attribute
-			Optional:    mode == CREATE,                                             // optionally provided by user on create
-			Description: "Hostname of the Kentik deployment where the data generated by this export should go, eg. flow.kentik.com",
+		"flow_dest": {
+			Type: schema.TypeString,
+			// if not specified by user, API server will provide value for this attribute
+			Computed: mode == readSingle || mode == readList || mode == create,
+			Optional: mode == create, // optionally provided by user on create
+			Description: "Hostname of the Kentik deployment where the data generated by this export should go, " +
+				"eg. flow.kentik.com",
 		},
-		"plan_id": &schema.Schema{
+		"plan_id": {
 			Type:        schema.TypeString,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Required:    mode == CREATE,                           // provided by user on create
+			Computed:    mode == readSingle || mode == readList, // provided by server on read
+			Required:    mode == create,                         // provided by user on create
 			Description: "The identifier of the Kentik plan associated with this task",
 		},
-		"cloud_provider": &schema.Schema{
+		"cloud_provider": {
 			Type:        schema.TypeString,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Required:    mode == CREATE,                           // provided by user on create
+			Computed:    mode == readSingle || mode == readList, // provided by server on read
+			Required:    mode == create,                         // provided by user on create
 			Description: "The cloud provider targeted by this export (aws, azure, gce, ibm)",
 		},
-		"aws": &schema.Schema{
-			// nested object
-			Type:        schema.TypeList,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Optional:    mode == CREATE,                           // optionally provided by user on create
-			Description: "Properties specific to Amazon Web Services \"vpc flow logs\" exports",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"bucket": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required:    mode == CREATE,                           // provided by user on create
-						Description: "Source S3 bucket to fetch vpc flow logs from",
-					},
-					"iam_role_arn": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required:    mode == CREATE,                           // provided by user on create
-						Description: "ARN for the IAM role to assume when fetching data or making AWS calls for this export",
-					},
-					"region": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required:    mode == CREATE,                           // provided by user on create
-						Description: "AWS region where this bucket resides",
-					},
-					"delete_after_read": &schema.Schema{
-						Type:        schema.TypeBool,
-						Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required:    mode == CREATE,                           // provided by user on create
-						Description: "If true, attempt to delete vpc flow log chunks from S3 after they've been read",
-					},
-					"multiple_buckets": &schema.Schema{
-						Type:     schema.TypeBool,
-						Computed: mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required: mode == CREATE,                           // provided by user on create
-					},
+		"aws":            makeAWSSchema(mode),
+		"azure":          makeAzureSchema(mode),
+		"bgp":            makeBGPSchema(mode),
+		"gce":            makeGCESchema(mode),
+		"ibm":            makeIBMSchema(mode),
+		"current_status": makeCurrentStatusSchema(),
+	}
+}
+
+func makeAWSSchema(mode schemaMode) *schema.Schema {
+	return &schema.Schema{
+		// nested object
+		Type:        schema.TypeList,
+		Computed:    mode == readSingle || mode == readList, // provided by server on read
+		Optional:    mode == create,                         // optionally provided by user on create
+		Description: "Properties specific to Amazon Web Services \"vpc flow logs\" exports",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"bucket": {
+					Type:        schema.TypeString,
+					Computed:    mode == readSingle || mode == readList, // provided by server on read
+					Required:    mode == create,                         // provided by user on create
+					Description: "Source S3 bucket to fetch vpc flow logs from",
 				},
-			},
-		},
-		"azure": &schema.Schema{
-			// nested object
-			Type:        schema.TypeList,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Optional:    mode == CREATE,                           // optionally provided by user on create
-			Description: "Properties specific to Azure exports",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"location": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required: mode == CREATE,                           // provided by user on create
-					},
-					"resource_group": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required: mode == CREATE,                           // provided by user on create
-					},
-					"storage_account": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required: mode == CREATE,                           // provided by user on create
-					},
-					"subscription_id": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required: mode == CREATE,                           // provided by user on create
-					},
-					"security_principal_enabled": &schema.Schema{
-						Type:     schema.TypeBool,
-						Computed: mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required: mode == CREATE,                           // provided by user on create
-					},
+				"iam_role_arn": {
+					Type:        schema.TypeString,
+					Computed:    mode == readSingle || mode == readList, // provided by server on read
+					Required:    mode == create,                         // provided by user on create
+					Description: "ARN for the IAM role to assume when fetching data or making AWS calls for this export",
 				},
-			},
-		},
-		"bgp": &schema.Schema{
-			// nested object
-			Type:        schema.TypeList,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Optional:    mode == CREATE,                           // optionally provided by user on create
-			Description: "Optional BGP related settings",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"apply_bgp": &schema.Schema{
-						Type:        schema.TypeBool,
-						Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required:    mode == CREATE,                           // provided by user on create
-						Description: "If true, apply BGP data discovered via another device to the flow from this export",
-					},
-					"use_bgp_device_id": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required:    mode == CREATE,                           // provided by user on create
-						Description: "Which other device to get BGP data from",
-					},
-					"device_bgp_type": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required:    mode == CREATE,                           // provided by user on create
-						Description: "device, other_device, none",
-					},
+				"region": {
+					Type:        schema.TypeString,
+					Computed:    mode == readSingle || mode == readList, // provided by server on read
+					Required:    mode == create,                         // provided by user on create
+					Description: "AWS region where this bucket resides",
 				},
-			},
-		},
-		"gce": &schema.Schema{
-			// nested object
-			Type:        schema.TypeList,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Optional:    mode == CREATE,                           // optionally provided by user on create
-			Description: "Properties specific to Google Cloud export",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"project": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required: mode == CREATE,                           // provided by user on create
-					},
-					"subscription": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required: mode == CREATE,                           // provided by user on create
-					},
+				"delete_after_read": {
+					Type:        schema.TypeBool,
+					Computed:    mode == readSingle || mode == readList, // provided by server on read
+					Required:    mode == create,                         // provided by user on create
+					Description: "If true, attempt to delete vpc flow log chunks from S3 after they've been read",
 				},
-			},
-		},
-		"ibm": &schema.Schema{
-			// nested object
-			Type:        schema.TypeList,
-			Computed:    mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-			Optional:    mode == CREATE,                           // optionally provided by user on create
-			Description: "Properties specific to IBM Cloud exports",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"bucket": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: mode == READ_SINGLE || mode == READ_LIST, // provided by server on read
-						Required: mode == CREATE,                           // provided by user on create
-					},
-				},
-			},
-		},
-		"current_status": &schema.Schema{
-			// nested object
-			Type:        schema.TypeList,
-			Computed:    true, // always provided by server
-			Description: "Export task status",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"status": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Description: "OK, ERROR or other short and descriptive status",
-					},
-					"error_message": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Description: "If not empty, the current error",
-					},
-					"flow_found": &schema.Schema{
-						Type:        schema.TypeBool,
-						Computed:    true,
-						Description: "If true, we found flow logs",
-					},
-					"api_access": &schema.Schema{
-						Type:     schema.TypeBool,
-						Computed: true,
-					},
-					"storage_account_access": &schema.Schema{
-						Type:     schema.TypeBool,
-						Computed: true,
-					},
+				"multiple_buckets": {
+					Type:     schema.TypeBool,
+					Computed: mode == readSingle || mode == readList, // provided by server on read
+					Required: mode == create,                         // provided by user on create
 				},
 			},
 		},
 	}
 }
 
-// cloudExportToMap is used for API get operation to fill terraform resource from cloudexport item
+func makeAzureSchema(mode schemaMode) *schema.Schema {
+	return &schema.Schema{
+		// nested object
+		Type:        schema.TypeList,
+		Computed:    mode == readSingle || mode == readList, // provided by server on read
+		Optional:    mode == create,                         // optionally provided by user on create
+		Description: "Properties specific to Azure exports",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"location": {
+					Type:     schema.TypeString,
+					Computed: mode == readSingle || mode == readList, // provided by server on read
+					Required: mode == create,                         // provided by user on create
+				},
+				"resource_group": {
+					Type:     schema.TypeString,
+					Computed: mode == readSingle || mode == readList, // provided by server on read
+					Required: mode == create,                         // provided by user on create
+				},
+				"storage_account": {
+					Type:     schema.TypeString,
+					Computed: mode == readSingle || mode == readList, // provided by server on read
+					Required: mode == create,                         // provided by user on create
+				},
+				"subscription_id": {
+					Type:     schema.TypeString,
+					Computed: mode == readSingle || mode == readList, // provided by server on read
+					Required: mode == create,                         // provided by user on create
+				},
+				"security_principal_enabled": {
+					Type:     schema.TypeBool,
+					Computed: mode == readSingle || mode == readList, // provided by server on read
+					Required: mode == create,                         // provided by user on create
+				},
+			},
+		},
+	}
+}
+
+func makeBGPSchema(mode schemaMode) *schema.Schema {
+	return &schema.Schema{
+		// nested object
+		Type:        schema.TypeList,
+		Computed:    mode == readSingle || mode == readList, // provided by server on read
+		Optional:    mode == create,                         // optionally provided by user on create
+		Description: "Optional BGP related settings",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"apply_bgp": {
+					Type:        schema.TypeBool,
+					Computed:    mode == readSingle || mode == readList, // provided by server on read
+					Required:    mode == create,                         // provided by user on create
+					Description: "If true, apply BGP data discovered via another device to the flow from this export",
+				},
+				"use_bgp_device_id": {
+					Type:        schema.TypeString,
+					Computed:    mode == readSingle || mode == readList, // provided by server on read
+					Required:    mode == create,                         // provided by user on create
+					Description: "Which other device to get BGP data from",
+				},
+				"device_bgp_type": {
+					Type:        schema.TypeString,
+					Computed:    mode == readSingle || mode == readList, // provided by server on read
+					Required:    mode == create,                         // provided by user on create
+					Description: "device, other_device, none",
+				},
+			},
+		},
+	}
+}
+
+func makeGCESchema(mode schemaMode) *schema.Schema {
+	return &schema.Schema{
+		// nested object
+		Type:        schema.TypeList,
+		Computed:    mode == readSingle || mode == readList, // provided by server on read
+		Optional:    mode == create,                         // optionally provided by user on create
+		Description: "Properties specific to Google Cloud export",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"project": {
+					Type:     schema.TypeString,
+					Computed: mode == readSingle || mode == readList, // provided by server on read
+					Required: mode == create,                         // provided by user on create
+				},
+				"subscription": {
+					Type:     schema.TypeString,
+					Computed: mode == readSingle || mode == readList, // provided by server on read
+					Required: mode == create,                         // provided by user on create
+				},
+			},
+		},
+	}
+}
+
+func makeIBMSchema(mode schemaMode) *schema.Schema {
+	return &schema.Schema{
+		// nested object
+		Type:        schema.TypeList,
+		Computed:    mode == readSingle || mode == readList, // provided by server on read
+		Optional:    mode == create,                         // optionally provided by user on create
+		Description: "Properties specific to IBM Cloud exports",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"bucket": {
+					Type:     schema.TypeString,
+					Computed: mode == readSingle || mode == readList, // provided by server on read
+					Required: mode == create,                         // provided by user on create
+				},
+			},
+		},
+	}
+}
+
+func makeCurrentStatusSchema() *schema.Schema {
+	return &schema.Schema{
+		// nested object
+		Type:        schema.TypeList,
+		Computed:    true, // always provided by server
+		Description: "Export task status",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"status": {
+					Type:        schema.TypeString,
+					Computed:    true,
+					Description: "OK, ERROR or other short and descriptive status",
+				},
+				"error_message": {
+					Type:        schema.TypeString,
+					Computed:    true,
+					Description: "If not empty, the current error",
+				},
+				"flow_found": {
+					Type:        schema.TypeBool,
+					Computed:    true,
+					Description: "If true, we found flow logs",
+				},
+				"api_access": {
+					Type:     schema.TypeBool,
+					Computed: true,
+				},
+				"storage_account_access": {
+					Type:     schema.TypeBool,
+					Computed: true,
+				},
+			},
+		},
+	}
+}
+
+// cloudExportToMap is used for API get operation to fill terraform resource from cloudexport item.
 func cloudExportToMap(e *cloudexport.V202101beta1CloudExport) map[string]interface{} {
 	o := make(map[string]interface{})
 	if e == nil {
@@ -314,35 +334,35 @@ func cloudExportToMap(e *cloudexport.V202101beta1CloudExport) map[string]interfa
 	}
 
 	if e.CurrentStatus != nil {
-		current_status := make(map[string]interface{})
-		current_status["status"] = e.CurrentStatus.Status
-		current_status["error_message"] = e.CurrentStatus.ErrorMessage
-		current_status["flow_found"] = e.CurrentStatus.FlowFound
-		current_status["api_access"] = e.CurrentStatus.ApiAccess
-		current_status["storage_account_access"] = e.CurrentStatus.StorageAccountAccess
-		o["current_status"] = []interface{}{current_status}
+		cs := make(map[string]interface{})
+		cs["status"] = e.CurrentStatus.Status
+		cs["error_message"] = e.CurrentStatus.ErrorMessage
+		cs["flow_found"] = e.CurrentStatus.FlowFound
+		cs["api_access"] = e.CurrentStatus.ApiAccess
+		cs["storage_account_access"] = e.CurrentStatus.StorageAccountAccess
+		o["current_status"] = []interface{}{cs}
 	}
 
 	return o
 }
 
-// resourceDataToCloudExport is used for API create/update operations to fill cloudexport item from terraform resource
+// resourceDataToCloudExport is used for API create/update operations to fill cloudexport item from terraform resource.
 func resourceDataToCloudExport(d *schema.ResourceData) (*cloudexport.V202101beta1CloudExport, error) {
 	// Note: only set the user-writable attributes, read-only attributes that are only generated on server side:
-	// CurrentStatus, are left with nil values and so are not serialized and not sent to apiserver
+	// CurrentStatus, are left with nil values and so are not serialized and not sent to API server
 
 	export := cloudexport.NewV202101beta1CloudExport()
 
 	// required
-	type_ := d.Get("type")
-	export.SetType(cloudexport.V202101beta1CloudExportType(type_.(string)))
+	t := d.Get("type")
+	export.SetType(cloudexport.V202101beta1CloudExportType(t.(string)))
 
 	// required
 	enabled := d.Get("enabled")
 	export.SetEnabled(enabled.(bool))
 
 	// required
- 	name := d.Get("name")
+	name := d.Get("name")
 	export.SetName(name.(string))
 
 	// optional
@@ -365,17 +385,17 @@ func resourceDataToCloudExport(d *schema.ResourceData) (*cloudexport.V202101beta
 	export.SetPlanId(planID.(string))
 
 	// required
-	cloudProvider := d.Get("cloud_provider").(string)
+	cloudProvider := d.Get("cloud_provider").(string) //nolint: errcheck, forcetypeassert // type enforced by schema
 	export.SetCloudProvider(cloudProvider)
 
-	// validation: for any given cloud_provider, there should also be an object of the same name, containing configuration details
-	// eg for cloud_provider="ibm", ibm{...} object should be defined
+	// validation: for any given cloud_provider, there should also be an object of the same name,
+	// containing configuration details, e.g. for cloud_provider="ibm", ibm{...} object should be defined
 	providerObj, ok := d.GetOk(cloudProvider)
 	if !ok {
 		return nil, fmt.Errorf("for cloud_provider=%[1]s, there should also be %[1]s{...} attribute provided", cloudProvider)
 	}
-	providerDef := providerObj.([]interface{})[0] // extract nested object under index 0. Terraform clumsyness
-	providerMap := providerDef.(map[string]interface{})
+	providerDef := providerObj.([]interface{})[0]       // extract nested object under index 0. Terraform clumsiness
+	providerMap := providerDef.(map[string]interface{}) //nolint: errcheck, forcetypeassert // type enforced by schema
 	switch cloudProvider {
 	case "aws":
 		{

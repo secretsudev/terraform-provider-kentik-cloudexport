@@ -15,11 +15,11 @@ func dataSourceCloudExportList() *schema.Resource {
 		Description: "DataSource representing list of cloud exports",
 		ReadContext: dataSourceCloudExportListRead,
 		Schema: map[string]*schema.Schema{
-			"items": &schema.Schema{
+			"items": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
-					Schema: makeCloudExportSchema(READ_LIST),
+					Schema: makeCloudExportSchema(readList),
 				},
 			},
 		},
@@ -36,9 +36,10 @@ func dataSourceCloudExportListRead(ctx context.Context, d *schema.ResourceData, 
 
 	if listResp.Exports != nil {
 		numExports := len(*listResp.Exports)
-		exports := make([]interface{}, numExports, numExports)
+		exports := make([]interface{}, numExports)
 		for i, e := range *listResp.Exports {
-			exports[i] = cloudExportToMap(&e)
+			ee := e // avoid implicit memory aliasing in for loop (G601)
+			exports[i] = cloudExportToMap(&ee)
 		}
 
 		if err = d.Set("items", exports); err != nil {
@@ -46,7 +47,8 @@ func dataSourceCloudExportListRead(ctx context.Context, d *schema.ResourceData, 
 		}
 	}
 
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10)) // use unixtime as id to force list update every time terraform asks for the list
+	// use UNIX time as ID to force list update every time Terraform asks for the list
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 
 	return nil
 }

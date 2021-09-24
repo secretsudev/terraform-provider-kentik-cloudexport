@@ -1,4 +1,4 @@
-package provider
+package provider_test
 
 import (
 	"net/http"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/kentik/terraform-provider-kentik-cloudexport/internal/provider"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,8 +23,8 @@ func checkAPIServerConnection(t *testing.T) {
 // to create a provider server to which the CLI can reattach.
 func providerFactories() map[string]func() (*schema.Provider, error) {
 	return map[string]func() (*schema.Provider, error){
-		"kentik-cloudexport": func() (*schema.Provider, error) {
-			return New(), nil
+		"kentik-cloudexport": func() (*schema.Provider, error) { //nolint: unparam
+			return provider.New(), nil
 		},
 	}
 }

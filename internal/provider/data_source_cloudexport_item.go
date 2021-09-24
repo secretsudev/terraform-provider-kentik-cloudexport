@@ -12,7 +12,7 @@ func dataSourceCloudExportItem() *schema.Resource {
 	return &schema.Resource{
 		Description: "DataSource representing single cloud export item",
 		ReadContext: dataSourceCloudExportItemRead,
-		Schema:      makeCloudExportSchema(READ_SINGLE),
+		Schema:      makeCloudExportSchema(readSingle),
 	}
 }
 
