@@ -26,7 +26,7 @@ func New() *schema.Provider {
 		Schema: map[string]*schema.Schema{
 			apiURLKey: {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("KTAPI_URL", nil),
 				Description: "CloudExport API server URL (optional). Can also be specified with KTAPI_URL environment variable.",
 			},
@@ -39,7 +39,7 @@ func New() *schema.Provider {
 			tokenKey: {
 				Type:        schema.TypeString,
 				Sensitive:   true,
-				Optional:    true,
+				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("KTAPI_AUTH_TOKEN", nil),
 				Description: "Authorization token (required). Can also be specified with KTAPI_AUTH_TOKEN environment variable.",
 			},
