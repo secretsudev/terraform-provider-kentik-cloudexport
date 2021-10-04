@@ -18,6 +18,7 @@ var providerFactories = map[string]func() (*schema.Provider, error){
 }
 
 func TestProvider(t *testing.T) {
+	t.Parallel()
 	if err := New().InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}

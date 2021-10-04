@@ -11,6 +11,7 @@ import (
 // Note: only check that the expected items are on the returned list, the items detailed check is done in data_source_cloudexport_item_test.go
 
 func TestDataSourceCloudExportList(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,

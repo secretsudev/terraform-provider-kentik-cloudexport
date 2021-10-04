@@ -13,6 +13,7 @@ import (
 // Note: we only check the user-provided values as we don't control the server-provided ones
 
 func TestResourceCloudExportAWS(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -66,6 +67,7 @@ func TestResourceCloudExportAWS(t *testing.T) {
 }
 
 func TestResourceCloudExportGCE(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -109,6 +111,7 @@ func TestResourceCloudExportGCE(t *testing.T) {
 }
 
 func TestResourceCloudExportIBM(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -150,6 +153,7 @@ func TestResourceCloudExportIBM(t *testing.T) {
 }
 
 func TestResourceCloudExportAzure(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -199,6 +203,7 @@ func TestResourceCloudExportAzure(t *testing.T) {
 }
 
 func TestResourceCloudExportBGP(t *testing.T) {
+	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
