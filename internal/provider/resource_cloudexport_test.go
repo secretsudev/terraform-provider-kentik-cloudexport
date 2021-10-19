@@ -15,8 +15,8 @@ import (
 func TestResourceCloudExportAWS(t *testing.T) {
 	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
+		PreCheck:          func() { checkAPIServerConnection(t) },
+		ProviderFactories: providerFactories(),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceCloudExportCreateAWS,
@@ -69,8 +69,8 @@ func TestResourceCloudExportAWS(t *testing.T) {
 func TestResourceCloudExportGCE(t *testing.T) {
 	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
+		PreCheck:          func() { checkAPIServerConnection(t) },
+		ProviderFactories: providerFactories(),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceCloudExportCreateGCE,
@@ -113,8 +113,8 @@ func TestResourceCloudExportGCE(t *testing.T) {
 func TestResourceCloudExportIBM(t *testing.T) {
 	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
+		PreCheck:          func() { checkAPIServerConnection(t) },
+		ProviderFactories: providerFactories(),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceCloudExportCreateIBM,
@@ -155,8 +155,8 @@ func TestResourceCloudExportIBM(t *testing.T) {
 func TestResourceCloudExportAzure(t *testing.T) {
 	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
+		PreCheck:          func() { checkAPIServerConnection(t) },
+		ProviderFactories: providerFactories(),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceCloudExportCreateAzure,
@@ -205,8 +205,8 @@ func TestResourceCloudExportAzure(t *testing.T) {
 func TestResourceCloudExportBGP(t *testing.T) {
 	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
+		PreCheck:          func() { checkAPIServerConnection(t) },
+		ProviderFactories: providerFactories(),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceCloudExportCreateBGP,
