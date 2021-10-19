@@ -26,6 +26,17 @@ provider "kentik-cloudexport" {
 
 ### Optional
 
-- **apiurl** (String) Custom apiserver url can be specified either by apiurl attribute or KTAPI_URL environment variable. If not specified, default of <https://cloudexports.api.kentik.com> will be used
-- **email** (String) Authorization. Either email attribute or KTAPI_AUTH_EMAIL environment variable is required
-- **token** (String, Sensitive) Authorization. Either token attribute or KTAPI_AUTH_TOKEN  environment variable is required
+- **apiurl** (String) CloudExport API server URL (optional). Can also be specified with KTAPI_URL environment variable.
+- **email** (String) Authorization email (required). Can also be specified with KTAPI_AUTH_EMAIL environment variable.
+- **log_payloads** (Boolean) Log payloads flag enables verbose debug logs of requests and responses (optional). Can also be specified with KTAPI_LOG_PAYLOADS environment variable.
+- **retry** (Block List, Max: 1) Configuration for API client retry mechanism (see [below for nested schema](#nestedblock--retry))
+- **token** (String, Sensitive) Authorization token (required). Can also be specified with KTAPI_AUTH_TOKEN environment variable.
+
+<a id="nestedblock--retry"></a>
+### Nested Schema for `retry`
+
+Optional:
+
+- **max_attempts** (Number) Maximum number of request retry attempts. Default: 100. Can also be specified with KTAPI_RETRY_MAX_ATTEMPTS environment variable.
+- **max_delay** (String) Maximum delay before request retry. Expected Go time duration format, e.g. 1s (see: <https://pkg.go.dev/time#ParseDuration>). Default: 5m (5 minutes). Can also be specified with KTAPI_RETRY_MAX_DELAY environment variable.
+- **min_delay** (String) Minimum delay before request retry. Expected Go time duration format, e.g. 1s (see: <https://pkg.go.dev/time#ParseDuration>). Default: 1s (1 second). Can also be specified with KTAPI_RETRY_MIN_DELAY environment variable.
