@@ -244,6 +244,8 @@ github.com/jstemmer/go-junit-report v0.9.1 h1:6QPYqodiu3GuPL+7mfx+NwDdp2eTkp9IfE
 github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/XSXhF0NWZEnDohbsk=
 github.com/kentik/community_sdk_golang v0.2.1-0.20210914003249-df5c43689c05 h1:E/xE4gTv7nwIdPfHkf7atBSFannBjpZAg5CjFaOXVr0=
 github.com/kentik/community_sdk_golang v0.2.1-0.20210914003249-df5c43689c05/go.mod h1:RB11Fk6O42x/rdEMzuNBTUjxq2txy6JTDWCerL4lwcA=
+github.com/kentik/community_sdk_golang v0.2.1-0.20211001164315-c43176b3332a h1:HyOVbCOC744esJpvf+xXb7cIl421P/gJSFmDFA/EIQg=
+github.com/kentik/community_sdk_golang v0.2.1-0.20211001164315-c43176b3332a/go.mod h1:O3BUWEHhUW0RVqcNKUL1MS58Jzwxc6+tZip/fqz/7Z0=
 github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 h1:DowS9hvgyYSX4TO5NpyC606/Z4SxnNYbT+WX27or6Ck=
 github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351/go.mod h1:CT57kijsi8u/K/BOFA39wgDQJ9CxiF4nAY/ojJ6r6mM=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=

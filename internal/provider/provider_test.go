@@ -1,38 +1,90 @@
 package provider
 
 import (
-	"net/http"
-	"os"
+	"regexp"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/stretchr/testify/assert"
 )
-
-// providerFactories are used to instantiate a provider during acceptance testing.
-// The factory function will be invoked for every Terraform CLI command executed
-// to create a provider server to which the CLI can reattach.
-var providerFactories = map[string]func() (*schema.Provider, error){
-	"kentik-cloudexport": func() (*schema.Provider, error) {
-		return New(), nil
-	},
-}
 
 func TestProvider(t *testing.T) {
 	t.Parallel()
-	if err := New().InternalValidate(); err != nil {
-		t.Fatalf("err: %s", err)
-	}
+	err := New().InternalValidate()
+	assert.NoError(t, err)
 }
 
-// in case of custom apiserver url is set, check if the configured server is running
-func testAccPreCheck(t *testing.T) {
-	addr, ok := os.LookupEnv("KTAPI_URL")
-	if !ok {
-		return // KTAPI_URL not set - provider will connect to live kentik server
-	}
-
-	_, err := http.Get(addr)
-	if err != nil {
-		t.Fatalf("localhost_apiserver connection(url=%q) error: %v", addr, err)
-	}
+func TestProvider_Configure_MinimalConfig(t *testing.T) {
+	t.Parallel()
+	resource.UnitTest(t, resource.TestCase{
+		PreCheck:          func() { checkAPIServerConnection(t) },
+		ProviderFactories: providerFactories(),
+		Steps: []resource.TestStep{{
+			Config: minimalConfig,
+		}},
+	})
 }
+
+func TestProvider_Configure_CustomRetryConfig(t *testing.T) {
+	t.Parallel()
+	resource.UnitTest(t, resource.TestCase{
+		PreCheck:          func() { checkAPIServerConnection(t) },
+		ProviderFactories: providerFactories(),
+		Steps: []resource.TestStep{{
+			Config: customRetryConfig,
+		}},
+	})
+}
+
+func TestProvider_Configure_InvalidRetryConfig(t *testing.T) {
+	t.Parallel()
+	resource.UnitTest(t, resource.TestCase{
+		PreCheck:          func() { checkAPIServerConnection(t) },
+		ProviderFactories: providerFactories(),
+		Steps: []resource.TestStep{{
+			Config:      invalidRetryConfig,
+			ExpectError: regexp.MustCompile("parse max_delay duration"),
+		}},
+	})
+}
+
+const (
+	minimalConfig = `
+		provider "kentik-cloudexport" {}
+		
+		// Trigger arbitrary action
+		data "kentik-cloudexport_item" "aws" {
+			id = "1"
+		}
+	`
+	customRetryConfig = `
+		provider "kentik-cloudexport" {
+			retry {
+				max_attempts = 66
+				min_delay = "100ms"
+				max_delay = "1m"
+			}
+			log_payloads = true
+		}
+		
+		// Trigger arbitrary action
+		data "kentik-cloudexport_item" "aws" {
+			id = "1"
+		}
+	`
+	invalidRetryConfig = `
+		provider "kentik-cloudexport" {
+			retry {
+				max_attempts = 66
+				min_delay = "100ms"
+				max_delay = "invalid-delay"
+			}
+			log_payloads = true
+		}
+		
+		// Trigger arbitrary action
+		data "kentik-cloudexport_item" "aws" {
+			id = "1"
+		}
+	`
+)

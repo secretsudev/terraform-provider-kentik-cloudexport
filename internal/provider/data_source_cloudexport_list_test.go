@@ -13,8 +13,8 @@ import (
 func TestDataSourceCloudExportList(t *testing.T) {
 	t.Parallel()
 	resource.UnitTest(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
+		PreCheck:          func() { checkAPIServerConnection(t) },
+		ProviderFactories: providerFactories(),
 		Steps: []resource.TestStep{
 			{
 				Config: testCloudExportDataSourceList,
