@@ -5,6 +5,19 @@ on:
   - push
 
 jobs:
+  super-linter:
+    name: Run Super-Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.3.5
+      - name: Run Super-Linter
+        uses: github/super-linter@v4.8.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_GO: false # Go linting is broken for now, see: https://github.com/github/super-linter/issues/143
+          VALIDATE_JSCPD: false # TODO(dfurman): consider configuring this linter
+
   golangci-lint:
     name: Run golangci-lint
     runs-on: ubuntu-latest
