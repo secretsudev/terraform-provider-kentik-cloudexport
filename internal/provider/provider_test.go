@@ -1,16 +1,17 @@
-package provider
+package provider_test
 
 import (
 	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/kentik/terraform-provider-kentik-cloudexport/internal/provider"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestProvider(t *testing.T) {
 	t.Parallel()
-	err := New().InternalValidate()
+	err := provider.New().InternalValidate()
 	assert.NoError(t, err)
 }
 

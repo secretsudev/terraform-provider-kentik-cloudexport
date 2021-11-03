@@ -9,7 +9,7 @@ import (
 
 func TestCloudExportSerializerAlwaysSetsTheEnabledField(t *testing.T) {
 	t.Parallel()
-	test_cases := []struct {
+	testCases := []struct {
 		configuredInput interface{}
 		expectedOutput  bool
 	}{
@@ -27,7 +27,7 @@ func TestCloudExportSerializerAlwaysSetsTheEnabledField(t *testing.T) {
 		},
 	}
 
-	for _, tc := range test_cases {
+	for _, tc := range testCases {
 		subtestName := fmt.Sprintf("Configured input: %v, expected output: %v", tc.configuredInput, tc.expectedOutput)
 		t.Run(subtestName, func(t *testing.T) {
 			// given
@@ -38,7 +38,6 @@ func TestCloudExportSerializerAlwaysSetsTheEnabledField(t *testing.T) {
 
 			// when
 			export, err := resourceDataToCloudExport(d)
-
 			// then
 			if err != nil {
 				t.Fatal(err)
@@ -63,8 +62,12 @@ func makeDummyResourceData(t *testing.T) *schema.ResourceData {
 	if err := d.Set("cloud_provider", provider); err != nil {
 		t.Fatal(err)
 	}
-	provider_definition := make(ProviderDefinition)
-	provider_definition["bucket"] = "dummy"
-	d.Set(provider, []ProviderDefinition{provider_definition})
+
+	pd := make(ProviderDefinition)
+	pd["bucket"] = "dummy"
+	if err := d.Set(provider, []ProviderDefinition{pd}); err != nil {
+		t.Fatal(err)
+	}
+
 	return d
 }

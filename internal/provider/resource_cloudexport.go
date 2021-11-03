@@ -17,7 +17,7 @@ func resourceCloudExport() *schema.Resource {
 		ReadContext:   resourceCloudExportRead,
 		UpdateContext: resourceCloudExportUpdate,
 		DeleteContext: resourceCloudExportDelete,
-		Schema:        makeCloudExportSchema(CREATE),
+		Schema:        makeCloudExportSchema(create),
 	}
 }
 
