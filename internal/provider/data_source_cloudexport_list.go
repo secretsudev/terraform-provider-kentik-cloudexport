@@ -12,7 +12,7 @@ import (
 
 func dataSourceCloudExportList() *schema.Resource {
 	return &schema.Resource{
-		Description: "DataSource representing list of cloud exports",
+		Description: "Data source representing list of cloud exports",
 		ReadContext: dataSourceCloudExportListRead,
 		Schema: map[string]*schema.Schema{
 			"items": {

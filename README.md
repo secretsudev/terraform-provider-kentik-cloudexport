@@ -2,12 +2,12 @@
 
 ## Release process
 
-Release process for the provider is based on github repo tags. Every tag with format v[0-9].[0-9].[0-9] will trigger automatic build of package and publish it in registry.terraform.io.
+Release process for the provider is based on GitHub repository tags. Every tag with format v[0-9].[0-9].[0-9] will trigger automatic build of package and publish it in registry.terraform.io.
 
 To build and release package:
 1. Make sure that all code that you want to release is in master branch
-1. Create tag with format v[0-9].[0-9].[0-9] in github. [Releases](https://github.com/kentik/terraform-provider-kentik-cloudexport/releases) -> Draft a new release -> Put tag version, name and description
-1. Go to [Github Actions](https://github.com/kentik/terraform-provider-kentik-cloudexport/actions)
+1. Create tag with format v[0-9].[0-9].[0-9] in GitHub. [Releases](https://github.com/kentik/terraform-provider-kentik-cloudexport/releases) -> Draft a new release -> Put tag version, name and description
+1. Go to [GitHub Actions](https://github.com/kentik/terraform-provider-kentik-cloudexport/actions)
 
 ## Requirements
 
